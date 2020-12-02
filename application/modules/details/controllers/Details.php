@@ -279,7 +279,7 @@ class Details extends CI_Controller {
         $data['detail'] = $this->details_model->getDetailsByPatientId($patient_id);
         $data['patient'] = $this->details_model->getPatientById($patient_id);
         $data['prescriptions'] = $this->schedule_model->getPrescriptionByPatientId($patient_id);
-        $data['phones'] = $this->d_medicine_model->getOverPhoneInfo();
+        //$data['phones'] = $this->d_medicine_model->getOverPhoneInfo();
         //$data['details'] = $this->details_model->getDetails($patient_id);
         $data['patient_id'] = $this->input->get('patient_id');
         $this->load->view('home/header'); // just the header file
@@ -310,22 +310,33 @@ class Details extends CI_Controller {
             'qt_qtc' => $this->input->post('qt_qtc'),
             'ex_beats' => $this->input->post('ex_beats')
         );
-
+        
         $ecgs = $this->details_model->getDetailsByPatientId($patient_id)->ecg;
-
         $ecg = json_decode($ecgs);
         if (!empty($ecg)) {
             array_push($ecg, $ecg_n);
         } else {
             $ecg = array($ecg_n);
         }
-
+        //$outputData=$ecg;
+        
         $data['ecg'] = json_encode($ecg);
-//        echo '<pre>';
-//        print_r($data);
-//        die();
         $this->details_model->updateDetailsData($patient_id, $data);
-        redirect('details/viewDetails?patient_id=' . $patient_id);
+
+        $outputData=$this->details_model->getDetailsByPatientId($patient_id);
+
+        $arrayName = array(
+            'key' => $outputData->id,
+            'ecg_data' =>$ecg , 
+        );
+
+        if($this->input->post('ajax_call')==1){
+            echo json_encode($ecg_n);
+            
+        }
+        else{
+            redirect('details/viewDetails?patient_id=' . $patient_id);
+        }
     }
 
     function deleteEcgFromArray() {
@@ -978,6 +989,55 @@ class Details extends CI_Controller {
         $data['past_medical_history'] = $past_medical_history;
         
         echo json_encode($data);
+    }
+
+    function get_ecg_data() {
+        $id = $this->input->post('ecg_id');
+        $patient_id = $this->input->post('patient_id');
+        $ecgs = $this->details_model->getDetailsByPatientId($patient_id)->ecg;
+        $ecgs = json_decode($ecgs);
+        $len =count($ecgs);
+        $desire_ecgs=array();
+        $x=0;
+        foreach ($ecgs as $ecg ) {
+            if($x==$id){
+                $desire_ecg=$ecg;
+            }
+            $x++;
+        }
+        echo json_encode($desire_ecg);
+    }
+
+    function update_ecg_data() {
+        $id=$this->input->post('numberofindex');
+        $patient_id=$this->input->post('patient_id');
+        $storeData = array(
+            'ecg_date' => $this->input->post('patient_id'),
+            'findings' => $this->input->post('findings'),
+            'rhythmc_sinus_AF' => $this->input->post('rhythmc_sinus_AF'),
+            'qrs_ms' => $this->input->post('qrs_ms'),
+            'rbbb_lbbb' => $this->input->post('rbbb_lbbb'),
+            'heart_block' => $this->input->post('heart_block'),
+            'qt_qtc' => $this->input->post('qt_qtc'), 
+            'ex_beats' => $this->input->post('ex_beats'), 
+        );
+
+        $ecgs = $this->details_model->getDetailsByPatientId($patient_id)->ecg;
+        $ecgs = json_decode($ecgs);
+        $len =count($ecgs);
+        $desire_ecgs=array();
+        $x=0;
+        foreach ($ecgs as $ecg ) {
+            if($x==$id){
+                $ecgs[$x]=$storeData;
+            }
+            $x++;
+        }
+        $data['ecg'] = json_encode($ecgs);
+        $this->details_model->updateDetailsData($patient_id, $data);
+        echo json_encode($ecgs);
+
+
     }
 
 }

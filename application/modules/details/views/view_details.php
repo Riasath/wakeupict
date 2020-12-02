@@ -423,7 +423,7 @@
                     </div>
                     <label for="inputEmail3" class="col-sm-2 control-label">ECG*</label>
                     <div class="col-sm-10">
-                        <table class="table table-bordered">
+                        <table id="userTable" class="table table-bordered">
                             <tr>
                                 <th>Date</th>
                                 <th>Findings</th>
@@ -445,28 +445,33 @@
                                     <input type="hidden" class="patient_id" name="patient_id" value="<?php echo $detail->patient_id; ?>" />
                                 </th>
                             </tr>
-                            <?php
-                            if (!empty($detail->ecg)) {
-                                $ecgs = json_decode($detail->ecg);
-                                foreach ($ecgs as $key => $ecg) {
-                                    ?>
-                                    <tr class="all_remove">
-                                        <td><?php echo $ecg->ecg_date; ?></td>
-                                        <td><?php echo $ecg->findings; ?></td>
-                                        <td><?php echo $ecg->rhythmc_sinus_AF; ?></td>
-                                        <td><?php echo $ecg->qrs_ms; ?></td>
-                                        <td><?php echo $ecg->rbbb_lbbb; ?></td>
-                                        <td><?php echo $ecg->heart_block; ?></td>
-                                        <td><?php echo $ecg->qt_qtc; ?></td>
-                                        <td><?php echo $ecg->ex_beats; ?></td>
-                                        <td>
-                                            <input type="checkbox" class="delete_checkbox" name="delete[]" value="<?php echo $key; ?>" />                                   
-                                        </td>
-                                    </tr>
-                                    <?php
+                            <div id="load_ajax_ecgs">
+                                <?php
+                                if (!empty($detail->ecg)) {
+                                    $ecgs = json_decode($detail->ecg);
+                                    foreach ($ecgs as $key => $ecg) {
+                                        ?>
+                                        <tr class="all_remove">
+                                            <td><?php echo $ecg->ecg_date; ?></td>
+                                            <td><?php echo $ecg->findings; ?></td>
+                                            <td><?php echo $ecg->rhythmc_sinus_AF; ?></td>
+                                            <td><?php echo $ecg->qrs_ms; ?></td>
+                                            <td><?php echo $ecg->rbbb_lbbb; ?></td>
+                                            <td><?php echo $ecg->heart_block; ?></td>
+                                            <td><?php echo $ecg->qt_qtc; ?></td>
+                                            <td><?php echo $ecg->ex_beats; ?></td>
+                                            <td>
+                                                <input type="checkbox" class="delete_checkbox" name="delete[]" value="<?php echo $key; ?>" />                                   
+                                                <button class="ecg_edit" name="ecg_edit" id='<?php echo $key; ?>'>Edit</button>
+                                            </td>
+                                        </tr>
+                                        <?php
+                                    }
                                 }
-                            }
-                            ?>
+                                ?>
+
+                            </div>
+                            
                         </table>
                     </div>
                 </div>
@@ -1551,7 +1556,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form role="form" action="details/updateEcg" method="post" enctype="multipart/form-data">
+                <form id="ecg_from" role="form" action="details/updateEcg" method="post" enctype="multipart/form-data">
                     <table class="table table-bordered">
                         <tr>
                             <th>Date</th>
@@ -1564,20 +1569,22 @@
                             <th>Ex Beats</th>
                         </tr>
                         <tr>
-                            <td><input type="date" class="form-control" name="ecg_date" value=""/></td>
-                            <td><input type="text" class="form-control" name="findings" value=""/></td>
-                            <td><input type="text" class="form-control" name="rhythmc_sinus_AF" value=""/></td>
-                            <td><input type="text" class="form-control" name="qrs_ms" value=""/></td>
-                            <td><input type="text" class="form-control" name="rbbb_lbbb" value=""/></td>
-                            <td><input type="text" class="form-control" name="heart_block" value=""/></td>
-                            <td><input type="text" class="form-control" name="qt_qtc" value=""/></td>
-                            <td><input type="text" class="form-control" name="ex_beats" value=""/></td>
+                            <td><input type="date" class="form-control" id="ecg_date" name="ecg_date" value=""/></td>
+                            <td><input type="text" class="form-control" id="findings" name="findings" value=""/></td>
+                            <td><input type="text" class="form-control" id="rhythmc_sinus_AF" name="rhythmc_sinus_AF" value=""/></td>
+                            <td><input type="text" class="form-control" id="qrs_ms" name="qrs_ms" value=""/></td>
+                            <td><input type="text" class="form-control" id="rbbb_lbbb" name="rbbb_lbbb" value=""/></td>
+                            <td><input type="text" class="form-control" id="heart_block" name="heart_block" value=""/></td>
+                            <td><input type="text" class="form-control" id="qt_qtc" name="qt_qtc" value=""/></td>
+                            <td><input type="text" class="form-control" id="ex_beats" name="ex_beats" value=""/></td>
                         </tr>
                     </table>
                     <div class="modal-footer">
-                        <input type="hidden" class="form-control" name="patient_id" value="<?php echo $detail->patient_id; ?>"/>
+                        <input type="hidden" class="form-control" id="numberofindex" name="numberofindex"/>    
+                        <input type="hidden" class="form-control" id="patient_id" name="patient_id" value="<?php echo $detail->patient_id; ?>"/>
                         <button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary btn-xs">Save</button>
+                        <button id="ecg_submit" class="btn btn-primary btn-xs">Save</button>
+                        <button type="button"  id="update_ecg" class="btn btn-primary btn-xs">Update</button>
                     </div>
                 </form>
             </div>
@@ -1623,6 +1630,7 @@
                         <input type="hidden" class="form-control" name="patient_id" value="<?php echo $detail->patient_id; ?>"/>
                         <button type="button" class="btn btn-secondary btn-xs" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary btn-xs">Save</button>
+                        
                     </div>
                 </form>
             </div>
@@ -2652,6 +2660,175 @@
 
                 $('#modalPMH').modal('show');
             });
+        });
+
+
+        // AJAX FROM SUBMIT
+        // Ajax Submit
+
+        $("#ecg_submit").click(function(e) {
+            e.preventDefault(e);
+            var ecg_date = $("#ecg_date").val();
+            var findings = $("#findings").val();
+            var rhythmc_sinus_AF = $("#rhythmc_sinus_AF").val();
+            var qrs_ms = $("#qrs_ms").val();
+            var rbbb_lbbb = $("#rbbb_lbbb").val();
+            var heart_block = $("#heart_block").val();
+            var qt_qtc = $("#qt_qtc").val();
+            var ex_beats = $("#ex_beats").val();
+			var patient_id = $("#patient_id").val();
+        
+
+            $.ajax({
+                type: "POST",
+                url: "<?php echo site_url('details/updateEcg') ?>",
+                data: {
+                    ecg_date: ecg_date,
+                    findings: findings,
+                    rhythmc_sinus_AF: rhythmc_sinus_AF,
+                    qrs_ms: qrs_ms,
+                    rbbb_lbbb: rbbb_lbbb,
+                    heart_block: heart_block,
+                    qt_qtc: qt_qtc,
+                    ex_beats: ex_beats,
+                    patient_id: patient_id,
+                    ajax_call: 1,
+                },
+                dataType: "JSON",
+                }).success( function(response) {
+                    var key = $('#userTable tr').length-1;
+                    
+                    $('#modalEcg').modal('hide');
+                    // var response = JSON.parse(response); 
+                     console.log(key);
+                     var response = $.makeArray( response );
+                    var len = response.length;
+                    console.log(len);
+                    for(var i=0; i<len; i++){
+                        var ecg_date = response[i].ecg_date;
+                        var findings = response[i].findings;
+                        var rhythmc_sinus_AF = response[i].rhythmc_sinus_AF;
+                        var qrs_ms = response[i].qrs_ms;
+                        var rbbb_lbbb = response[i].rbbb_lbbb;
+                        var heart_block = response[i].heart_block;
+                        var qt_qtc = response[i].qt_qtc;
+                        var ex_beats = response[i].ex_beats;
+
+                        var tr_str = "<tr>" +
+                            "<td align='center'>" + ecg_date + "</td>" +
+                            "<td align='center'>" + findings + "</td>" +
+                            "<td align='center'>" + rhythmc_sinus_AF + "</td>" +
+                            "<td align='center'>" + qrs_ms + "</td>" +
+
+                            "<td align='center'>" + rbbb_lbbb + "</td>" +
+                            "<td align='center'>" + heart_block + "</td>" +
+                            "<td align='center'>" + qt_qtc + "</td>" +
+                            "<td align='center'>" + ex_beats + "</td>" +
+
+                            '<td><input type=checkbox class="delete_checkbox" name="delete[]" value='+key+'></input><button class="ecg_edit" name="ecg_edit" id='+key+'>Edit</button></td>'+
+                           
+  
+
+
+                            "</tr>";
+
+                        $("#userTable tbody").append(tr_str);
+                    }
+                    
+                    //$('#load_ajax_ecgs').html(data);
+                    
+                    
+                    
+                }
+		    );
+        });
+
+
+        // Ajax Edit call 
+
+        $(".ecg_edit").click(function(e) {
+            var id = this.id;
+            var patient_id = $("#patient_id").val();
+
+            $('#modalEcg').modal('show');
+
+
+
+            alert(id);
+            $.ajax({
+                type: "POST",
+                url: "<?php echo site_url('details/get_ecg_data') ?>",
+                data: {
+                    ecg_id: id,
+                    patient_id: patient_id,
+                },
+                dataType: "JSON",
+                }).success( function(response) {
+                    console.log(response.ecg_date);
+                    
+                    $('#ecg_date').val(response.ecg_date);
+                    $('#findings').val(response.findings);
+                    $('#rhythmc_sinus_AF').val(response.rhythmc_sinus_AF);
+                    $('#qrs_ms').val(response.qrs_ms);
+                    $('#rbbb_lbbb').val(response.rbbb_lbbb);
+                    $('#heart_block').val(response.heart_block);
+                    $('#qt_qtc').val(response.qt_qtc);
+                    $('#ex_beats').val(response.ex_beats);
+                    $('#numberofindex').val(id);
+
+                    $('#ecg_submit').hide();
+                    $('#update_ecg').show();
+
+                    
+
+
+                    
+                        
+                }
+        
+            );
+        });
+
+
+        $("#update_ecg").click(function(e) {
+            var ecg_date = $("#ecg_date").val();
+            var findings = $("#findings").val();
+            var rhythmc_sinus_AF = $("#rhythmc_sinus_AF").val();
+            var qrs_ms = $("#qrs_ms").val();
+            var rbbb_lbbb = $("#rbbb_lbbb").val();
+            var heart_block = $("#heart_block").val();
+            var qt_qtc = $("#qt_qtc").val();
+            var ex_beats = $("#ex_beats").val();
+            var patient_id = $("#patient_id").val();
+            var numberofindex = $("#numberofindex").val();
+            $('#modalEcg').modal('hide');
+            alert(numberofindex);
+            //Hellow
+            $.ajax({
+                type: "POST",
+                url: "<?php echo site_url('details/update_ecg_data') ?>",
+                data: {
+                    ecg_date: ecg_date,
+                    findings: findings,
+                    rhythmc_sinus_AF: rhythmc_sinus_AF,
+                    qrs_ms: qrs_ms,
+                    rbbb_lbbb: rbbb_lbbb,
+                    heart_block: heart_block,
+                    qt_qtc: qt_qtc,
+                    ex_beats: ex_beats,
+                    patient_id: patient_id,
+                    numberofindex: numberofindex,
+                    ajax_call: 1,
+                },
+                dataType: "JSON",
+                }).success( function(response) {
+                    console.log(response);
+                    
+                           
+                }
+            );
+
+            //Hellow 
         });
     });
 </script>
