@@ -2644,6 +2644,7 @@
 <script type="text/javascript">
 // Edit past_medical_history
     $(document).ready(function () {
+        onloaddata();
         $(".editPMH").click(function (e) {
             e.preventDefault(e);
             // Get the record's ID via attribute  
@@ -2703,7 +2704,56 @@
                             "</tr>";
 
                         $("#userTable tbody").append(tr_str);
-                    }    
+                    }
+
+
+                    $(".ecg_edit").click(function(e) {
+            var id = this.id;
+            var patient_id = $("#patient_id").val();
+
+            $('#modalEcg').modal('show');
+
+
+
+            alert(id);
+            $.ajax({
+                type: "POST",
+                url: "<?php echo site_url('details/get_ecg_data') ?>",
+                data: {
+                    ecg_id: id,
+                    patient_id: patient_id,
+                },
+                dataType: "JSON",
+                }).success( function(response) {
+                    console.log(response.ecg_date);
+                    
+                    $('#ecg_date').val(response.ecg_date);
+                    $('#findings').val(response.findings);
+                    $('#rhythmc_sinus_AF').val(response.rhythmc_sinus_AF);
+                    $('#qrs_ms').val(response.qrs_ms);
+                    $('#rbbb_lbbb').val(response.rbbb_lbbb);
+                    $('#heart_block').val(response.heart_block);
+                    $('#qt_qtc').val(response.qt_qtc);
+                    $('#ex_beats').val(response.ex_beats);
+                    $('#numberofindex').val(id);
+
+                    $('#ecg_submit').hide();
+                    $('#update_ecg').show();
+
+                    
+
+
+                    
+                        
+                }
+        
+            );
+        });
+                    
+                    
+
+
+
                 }
 		    );
         }
@@ -2792,48 +2842,7 @@
 
         // Ajax Edit call 
 
-        $(".ecg_edit").click(function(e) {
-            var id = this.id;
-            var patient_id = $("#patient_id").val();
-
-            $('#modalEcg').modal('show');
-
-
-
-            alert(id);
-            $.ajax({
-                type: "POST",
-                url: "<?php echo site_url('details/get_ecg_data') ?>",
-                data: {
-                    ecg_id: id,
-                    patient_id: patient_id,
-                },
-                dataType: "JSON",
-                }).success( function(response) {
-                    console.log(response.ecg_date);
-                    
-                    $('#ecg_date').val(response.ecg_date);
-                    $('#findings').val(response.findings);
-                    $('#rhythmc_sinus_AF').val(response.rhythmc_sinus_AF);
-                    $('#qrs_ms').val(response.qrs_ms);
-                    $('#rbbb_lbbb').val(response.rbbb_lbbb);
-                    $('#heart_block').val(response.heart_block);
-                    $('#qt_qtc').val(response.qt_qtc);
-                    $('#ex_beats').val(response.ex_beats);
-                    $('#numberofindex').val(id);
-
-                    $('#ecg_submit').hide();
-                    $('#update_ecg').show();
-
-                    
-
-
-                    
-                        
-                }
         
-            );
-        });
 
 
         $("#update_ecg").click(function(e) {
