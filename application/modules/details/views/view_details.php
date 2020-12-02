@@ -2606,6 +2606,22 @@
             }
         });
 
+        
+    });
+    var clicked = false;
+    $(".checkall").on("click", function () {
+        $(".delete_checkbox").prop("checked", !clicked);
+        clicked = !clicked;
+        this.innerHTML = clicked ? 'Deselect All' : 'Select All';
+    });
+
+</script>
+
+<script type="text/javascript">
+// Edit past_medical_history
+    $(document).ready(function () {
+        
+        onloaddata();
         $('#delete_all').click(function () {
             var checkbox = $('.delete_checkbox:checked');
             var details_id = $('.details_id').val();
@@ -2624,6 +2640,7 @@
                     success: function ()
                     {
                         $('.removeRow').fadeOut(1500);
+                        onloaddata();
                     }
                 })
             } else
@@ -2631,20 +2648,6 @@
                 alert('Select atleast one records');
             }
         });
-    });
-    var clicked = false;
-    $(".checkall").on("click", function () {
-        $(".delete_checkbox").prop("checked", !clicked);
-        clicked = !clicked;
-        this.innerHTML = clicked ? 'Deselect All' : 'Select All';
-    });
-
-</script>
-
-<script type="text/javascript">
-// Edit past_medical_history
-    $(document).ready(function () {
-        onloaddata();
         $(".editPMH").click(function (e) {
             e.preventDefault(e);
             // Get the record's ID via attribute  
