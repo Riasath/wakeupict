@@ -60,4 +60,10 @@ class D_medicine_model extends CI_model {
         $this->db->delete('d_medicine');
     }
 
+    function getOverPhoneInfo($id) {
+        $this->db->where('id', $id);
+        $query = $this->db->get('overphoneinfo');
+        return $query->result();
+    }
+
 }

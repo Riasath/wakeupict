@@ -51,6 +51,7 @@
                                                     <span class="sr-only">Toggle Dropdown</span>
                                                 </button>
                                                 <ul class="dropdown-menu" role="menu">
+                                                <li><a href="schedule/emailPrescription?id=<?php echo $prescription->id; ?>">Email</a></li>
                                                     <li><a href="schedule/viewPrescription?id=<?php echo $prescription->id; ?>">View</a></li>
                                                     <li><a href="schedule/editPrescription?id=<?php echo $prescription->id; ?>">Edit</a></li>
                                                     <li><a href="schedule/deletePrescription?id=<?php echo $prescription->id; ?>">Delete</a></li>

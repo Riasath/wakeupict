@@ -31,16 +31,18 @@ class Home extends CI_Controller {
     }
 
     public function calendar() {
+        $data = array();
         if ($this->ion_auth->in_group(array('doctor'))) {
             $current_user = $this->ion_auth->get_user_id();
             $doctor_id = $this->db->get_where('doctor', array('ion_user_id' => $current_user))->row()->id;
         }
         if ($this->ion_auth->in_group(array('patient'))) {
+            $data['popup_appointments'] = $this->appointment_model->getPopUpAppointments($date,$nextdate,$patient_id);
             $current_user = $this->ion_auth->get_user_id();
             $patient_id = $this->db->get_where('patient', array('ion_user_id' => $current_user))->row()->id;
         }
         date_default_timezone_set('Asia/Dhaka');
-        $data = array();
+        
         $date = date("Y-m-d");
         //$data['todaysAppointments'] = $this->appointment_model->getAppointmentByDoctorAndDate($doctor_id, $date);
         $data['todaysAppointments'] = $this->appointment_model->getTodaysAppointment($date);
@@ -54,7 +56,7 @@ class Home extends CI_Controller {
         $data['appointments'] = $this->appointment_model->getAppointment();
         
         $nextdate = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') + 2, date('Y')));
-        $data['popup_appointments'] = $this->appointment_model->getPopUpAppointments($date,$nextdate,$patient_id);
+        
         $this->load->view('header');
         $this->load->view('calendar', $data);
         $this->load->view('footer');

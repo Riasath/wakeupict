@@ -440,11 +440,65 @@ class Schedule extends CI_Controller {
 
     public function viewPrescription() {
         $id = $this->input->get('id');
-        $data['phones'] = $this->d_medicine_model->getOverPhoneInfo();
+        $data['phones'] = $this->d_medicine_model->getOverPhoneInfo($id);
         $data['prescription'] = $this->schedule_model->getPayrollById($id);
         $this->load->view('home/header');
         $this->load->view('prescription_view_1', $data);
         $this->load->view('home/footer');
+    }
+
+    public function emailPrescription() {
+        $id = $this->input->get('id');
+        $data['phones'] = $this->d_medicine_model->getOverPhoneInfo($id);
+        $data['prescription'] = $this->schedule_model->getPayrollById($id);
+        $patient_info = $this->patient_model->getPatientById($id);
+       
+        //$this->load->view('prescription_view_1', $data);
+        $html_content = $this->load->view('prescription_view_1',$data,true);
+        // Generate PDF
+		$this->load->library('pdf');
+		$this->pdf->loadHtml($html_content);
+		$this->pdf->render();
+        $output = $this->pdf->output();
+        $name=rand(10000000,99999999).'.pdf';
+        file_put_contents($name, $output);
+        $massage='Here is your prescription.';
+        if($patient_info){
+            if($patient_info->email){
+                $this->sentEmail($patient_info->email,$massage,$name);
+            }
+            else{
+                echo 'This user has no email address';
+            }
+        }
+        else{
+            echo 'Please check database';
+        }
+        
+        
+    }
+
+    public function sentEmail($emailTo,$massage,$prescription) {
+        echo $emailTo;
+        echo $massage;
+        echo $prescription;
+        exit();
+
+        $this->load->library('email');
+        $config=array(
+               'charset'=>'utf-8',
+               'wordwrap'=> TRUE,
+               'mailtype' => 'html'
+               );
+        $this->email->initialize($config);
+        $this->email->set_newline("\r\n");
+        $this->email->to($emailTo);
+        $this->email->from('yourdomainemail.com','Doctors Prescription');
+        $this->email->subject('Doctors Prescription From yourdomainemail.');
+        $this->email->message($massage);
+        $prescription='./'.$prescription;
+        $this->email->attach($prescription);
+        $this->email->send();
     }
 
     public function viewTodaysPrescription() {
