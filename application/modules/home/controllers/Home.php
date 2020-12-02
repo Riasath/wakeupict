@@ -37,7 +37,7 @@ class Home extends CI_Controller {
             $doctor_id = $this->db->get_where('doctor', array('ion_user_id' => $current_user))->row()->id;
         }
         if ($this->ion_auth->in_group(array('patient'))) {
-            $data['popup_appointments'] = $this->appointment_model->getPopUpAppointments($date,$nextdate,$patient_id);
+            
             $current_user = $this->ion_auth->get_user_id();
             $patient_id = $this->db->get_where('patient', array('ion_user_id' => $current_user))->row()->id;
         }
@@ -56,7 +56,10 @@ class Home extends CI_Controller {
         $data['appointments'] = $this->appointment_model->getAppointment();
         
         $nextdate = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') + 2, date('Y')));
-        
+        if ($this->ion_auth->in_group(array('patient'))) {
+            $data['popup_appointments'] = $this->appointment_model->getPopUpAppointments($date,$nextdate,$patient_id);
+            
+        }
         $this->load->view('header');
         $this->load->view('calendar', $data);
         $this->load->view('footer');
