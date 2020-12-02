@@ -2666,6 +2666,52 @@
         // AJAX FROM SUBMIT
         // Ajax Submit
 
+
+        function onloaddata(){
+            $("#userTable").find("tr:gt(0)").remove();
+            var patient_id = $("#patient_id").val();
+            $.ajax({
+                type: "POST",
+                url: "<?php echo site_url('details/onload_details') ?>",
+                data: {
+                    patient_id: patient_id,
+                },
+                dataType: "JSON",
+                }).success( function(response) {
+                    $('#modalEcg').modal('hide');
+                     var response = $.makeArray( response );
+                     var len = response.length;
+                    for(var i=0; i<len; i++){
+                        var ecg_date = response[i].ecg_date;
+                        var findings = response[i].findings;
+                        var rhythmc_sinus_AF = response[i].rhythmc_sinus_AF;
+                        var qrs_ms = response[i].qrs_ms;
+                        var rbbb_lbbb = response[i].rbbb_lbbb;
+                        var heart_block = response[i].heart_block;
+                        var qt_qtc = response[i].qt_qtc;
+                        var ex_beats = response[i].ex_beats;
+                        var tr_str = "<tr>" +
+                            "<td align='center'>" + ecg_date + "</td>" +
+                            "<td align='center'>" + findings + "</td>" +
+                            "<td align='center'>" + rhythmc_sinus_AF + "</td>" +
+                            "<td align='center'>" + qrs_ms + "</td>" +
+                            "<td align='center'>" + rbbb_lbbb + "</td>" +
+                            "<td align='center'>" + heart_block + "</td>" +
+                            "<td align='center'>" + qt_qtc + "</td>" +
+                            "<td align='center'>" + ex_beats + "</td>" +
+                            '<td><input type=checkbox class="delete_checkbox" name="delete[]" value='+i+'></input><button class="ecg_edit" name="ecg_edit" id='+i+'>Edit</button></td>'+
+                            "</tr>";
+
+                        $("#userTable tbody").append(tr_str);
+                    }    
+                }
+		    );
+        }
+
+
+
+
+
         $("#ecg_submit").click(function(e) {
             e.preventDefault(e);
             var ecg_date = $("#ecg_date").val();
@@ -2822,7 +2868,7 @@
                 },
                 dataType: "JSON",
                 }).success( function(response) {
-                    console.log(response);
+                    onloaddata();
                     
                            
                 }
@@ -2831,4 +2877,13 @@
             //Hellow 
         });
     });
+
+
+    
+
+
+
+
+
+
 </script>

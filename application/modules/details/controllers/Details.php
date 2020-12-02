@@ -1040,4 +1040,12 @@ class Details extends CI_Controller {
 
     }
 
+
+    function onload_details() {
+        $patient_id=$this->input->post('patient_id');
+        $ecgs = $this->details_model->getDetailsByPatientId($patient_id)->ecg;
+        echo $ecgs;
+
+    }
+
 }
