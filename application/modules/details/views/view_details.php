@@ -2781,8 +2781,8 @@
             $("#heart_block").val('');
             $("#qt_qtc").val('');
             $("#ex_beats").val('');
-            $("#patient_id").val('');
-            $("#numberofindex").val('');
+            $("#update_ecg").hide();
+            $("#ecg_submit").show();
         });
         // Update the Data with new data
         $("#update_ecg").click(function(e) {
