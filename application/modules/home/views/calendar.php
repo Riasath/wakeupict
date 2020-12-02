@@ -521,10 +521,32 @@
             </section>
             <!-- /.content -->
         </div>
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>                                        
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script type="text/javascript">
             $(document).ready(function () {
+                <?php 
+                    if($popup_appointments){
+                        $x =count($popup_appointments);
+                        $y='<ul>';
+                        foreach ($popup_appointments as $appointments ) {
+                            $y=$y.'<li>';
+                            $y=$y.'you have an appointment with '.$appointments->name.' on '.$appointments->available_date.' at '.$appointments->start_time;
+                            $y=$y.'</li>';
+                        }
+                        $y=$y.'</ul>';
+                    ?>
+                        
+                    
+                Swal.fire({
+                icon: 'success',
+                title: 'You have <?=$x?> appointment in next 3 days',
+                html: '<?=$y?>',
+            })
+
+                <?php }?>
+
+
                 $(".flashmessage").delay(3000).fadeOut(100);
             });
         </script>

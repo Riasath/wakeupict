@@ -52,6 +52,9 @@ class Home extends CI_Controller {
         //$data['patients'] = $this->patient_model->getPatient();
         $data['doctors'] = $this->doctor_model->getDoctor();
         $data['appointments'] = $this->appointment_model->getAppointment();
+        
+        $nextdate = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') + 2, date('Y')));
+        $data['popup_appointments'] = $this->appointment_model->getPopUpAppointments($date,$nextdate,$patient_id);
         $this->load->view('header');
         $this->load->view('calendar', $data);
         $this->load->view('footer');
@@ -59,6 +62,38 @@ class Home extends CI_Controller {
 
     public function test() {
         echo "I love my country";
+    }
+
+    public function email_notification() {
+        date_default_timezone_set('Asia/Dhaka');
+        $data = array();
+        $date = date("Y-m-d");
+        $nextdate = date('Y-m-d', mktime(0, 0, 0, date('m'), date('d') + 2, date('Y')));
+        $email_notification = $this->appointment_model->getEmailNotification($date,$nextdate);
+        $email_body='';
+        foreach ($email_notification as $email) {
+            $email_body=$email_body.$email->patient.' you have an appointment with '.$email->doctor.' on '.$email->available_date.' at '.$email->start_time.'.';
+            print_r($email_body);
+            echo '<br>';
+            $this->sentEmail($email->email,$email_body);             
+        }
+        echo 'Massage and Data Set here, Just need to configure Email to sent email';
+    }
+
+    public function sentEmail($emailTo,$massage) {
+        $this->load->library('email');
+        $config=array(
+               'charset'=>'utf-8',
+               'wordwrap'=> TRUE,
+               'mailtype' => 'html'
+               );
+        $this->email->initialize($config);
+        $this->email->set_newline("\r\n");
+        $this->email->to($emailTo);
+        $this->email->from('yourdomainemail.com','Doctors Appointment');
+        $this->email->subject('Doctors Appointment From yourdomainemail.');
+        $this->email->message($massage);
+        $this->email->send();
     }
 
 }

@@ -90,4 +90,34 @@ class Appointment_model extends CI_model {
         return $query->result();
     }
 
+    function getPopUpAppointments($date,$nextdate, $patient_id){
+        $this->db->join('doctor', 'doctor.id = schedule.doctor_id');
+        $this->db->order_by('sl_no', 'ASC');
+        $this->db->where('status', 'Approved');
+        $this->db->where('patient_id', $patient_id);
+        $this->db->where('available_date >=', $date);
+        $this->db->where('available_date <=', $nextdate);
+        $query = $this->db->get('schedule');
+        return $query->result();
+    }
+
+    function getEmailNotification($date,$nextdate){
+        $this->db->select('
+            schedule.available_date,
+            schedule.start_time,
+            schedule.end_time,
+            doctor.name as doctor,
+            patient.name as patient,
+            patient.email,
+        ');
+        $this->db->join('patient', 'patient.id = schedule.patient_id');
+        $this->db->join('doctor', 'doctor.id = schedule.doctor_id');
+        $this->db->order_by('sl_no', 'ASC');
+        $this->db->where('schedule.status', 'Approved');
+        $this->db->where('schedule.available_date >=', $date);
+        $this->db->where('schedule.available_date <=', $nextdate);
+        $query = $this->db->get('schedule');
+        return $query->result();
+    }
+
 }
